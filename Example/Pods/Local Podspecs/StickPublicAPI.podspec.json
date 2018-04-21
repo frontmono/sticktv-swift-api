@@ -1,0 +1,22 @@
+{
+  "name": "StickPublicAPI",
+  "version": "0.1.0",
+  "summary": "A short description of StickPublicAPI.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/frontmono/StickPublicAPI",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "frontmono": "hkim@titanplatform.us"
+  },
+  "source": {
+    "git": "https://github.com/frontmono/StickPublicAPI.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "StickPublicAPI/Classes/**/*"
+}

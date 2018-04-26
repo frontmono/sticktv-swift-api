@@ -32,11 +32,13 @@ public class STVAURL: NSObject {
     public private(set) var urlAccountServiceLogin:String!
     public private(set) var urlAccountStatus:String!
     public private(set) var urlAccountUserLogin:String!
+    public private(set) var urlAccountUserLogout:String!
     
     
     @objc public static func Ins() -> STVAURL {
         if(shared == nil){
             shared = STVAURL(type: .LOCAL);
+            //shared = STVAURL(type: .DEV);
         }
         return shared;
     }
@@ -46,15 +48,17 @@ public class STVAURL: NSObject {
         
         switch type {
         case .DEV:
-            self.domainAPI = "https://dev.api.wetribe.io"
+            self.domainAPI = "https://dev.api.stick.tv:8301"
         case .LOCAL:
-            self.domainAPI = "http://localhost:8300"
+            //self.domainAPI = "http://localhost:8300"
+            self.domainAPI = "http://192.168.106.101:8300"
         case .RELEASE:
             self.domainAPI = "https://api.wetribe.io"
         }
         self.urlAccountServiceLogin = self.domainAPI + "/1.0.0/account/serviceLogin"
         self.urlAccountStatus = self.domainAPI + "/1.0.0/account/status"
         self.urlAccountUserLogin = self.domainAPI + "/1.0.0/account/userLogin"
+        self.urlAccountUserLogout = self.domainAPI + "/1.0.0/account/userLogout"
         
     }
     

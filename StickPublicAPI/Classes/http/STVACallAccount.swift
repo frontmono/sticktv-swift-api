@@ -32,24 +32,25 @@ public class STVACallAccount: NSObject {
     
     }
     
-    @objc  public static func userInfo(userIdx: String?, completionHandler: @escaping (STVAUserInfo?, Error?)->Swift.Void){
-        /*
-        var dicParam = Dictionary<String, String>()
-        if userIdx != nil {
-            dicParam["user_idx"] = userIdx
-        }
-        STVAHttpRequest.requestAPI(URL: STVAURL.Ins().urlUserInfo, isGET: false, dicParams: dicParam ) { (result: STVACallResult) in
-            if result.error != nil {
-                completionHandler(nil, result.error)
-            }else{
-                if let jsonResult = result.data as? Dictionary<String, Any> {
-                    debugPrint(jsonResult)
+    @objc  public static func userLogout(completionHandler: @escaping (String?,  Error?) -> Swift.Void) {
+        STVAHttpRequest.requestAPIAfterToken(URL: STVAURL.Ins().urlAccountUserLogout, isGET: true, dicParams:nil) { (result: STVACallResult) in
+            if result.error != nil {completionHandler(nil, result.error)}
+            else{
+                if let dicResult = result.data as? Dictionary<String, String> {
+                    if let user_idx = dicResult["user_idx"] {
+                        STVAStatus.Ins().userIdx = nil
+                        STVAStatus.Ins().userEmail = nil
+                        completionHandler(user_idx, nil)
+                    }else{
+                        completionHandler(nil, NSError(domain: "no user idx and email", code: 0, userInfo: nil))
+                    }
                 }else{
-                    completionHandler(nil, NSError(domain: "no data  in result", code: 0, userInfo: nil))
+                    completionHandler(nil, NSError(domain: "data is not dic format", code: 0, userInfo: nil))
                 }
             }
+            
         }
- */
+        
         
     }
     

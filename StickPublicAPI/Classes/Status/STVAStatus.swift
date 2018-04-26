@@ -14,6 +14,7 @@ public class STVAStatus: NSObject {
     let saveAESKEY = "686A69918F22F4479D8DEA6E45587360"
     let saveAESIV = "3816227195CEBE78D5700E30319773BD"
     
+    public static let UserLoginObserverName = Notification.Name("OBERVER_STVAStatus_USER_LOGIN")
     
     public private(set) var accessToken:String?
     

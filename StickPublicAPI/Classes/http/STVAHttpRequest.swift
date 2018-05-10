@@ -9,6 +9,9 @@ import UIKit
 
 enum ParsingError: Error {
     case NoItem(itemname: String)
+    case InvalidURL(reason: String)
+    case InvalidResult(reason: String)
+    
 }
 
 
@@ -60,8 +63,19 @@ class STVACallResult: NSObject {
 
 class STVAHttpRequest: NSObject {
     
-    
-    @objc  public static func requestAPIAfterToken(URL url:String, isGET: Bool, dicParams:Dictionary<String, String>!, completionHandler: @escaping (_ result: STVACallResult) -> Swift.Void) -> Void {
+    @objc  public static func requestAPIAfterToken(URL url:String,
+                                                   isGET: Bool,
+                                                   dicParams:Dictionary<String, String>!,
+                                                   completionHandler: @escaping (_ result: STVACallResult) -> Swift.Void) -> Void {
+        self.requestAPIAfterToken(URL: url, isGET: isGET, dicParams: dicParams, dicData:nil, completionHandler: completionHandler)
+        
+        
+    }
+    @objc  public static func requestAPIAfterToken(URL url:String,
+                                                   isGET: Bool,
+                                                   dicParams:Dictionary<String, String>!,
+                                                   dicData:Dictionary<String, Any>?,
+                                                   completionHandler: @escaping (_ result: STVACallResult) -> Swift.Void) -> Void {
         
         func procMe(depth: Int){
             let deadlineTime = DispatchTime.now() + .seconds(1)
@@ -74,7 +88,7 @@ class STVAHttpRequest: NSObject {
                     httpURL += "?"
                 }
                 httpURL += STVASTR.SSID.rawValue + "=" + token
-                requestAPI(URL: httpURL, isGET: isGET, dicParams: dicParams, completionHandler: completionHandler)
+                requestAPI(URL: httpURL, isGET: isGET, dicParams: dicParams, dicData: dicData, completionHandler: completionHandler)
                 return
             }
             if(depth >= 10) {
@@ -92,8 +106,12 @@ class STVAHttpRequest: NSObject {
         procMe(depth: 0)
         
     }
-    @objc  public static func requestAPI(URL url:String, isGET: Bool, dicParams:Dictionary<String, String>!, completionHandler: @escaping (_ result: STVACallResult) -> Swift.Void) -> Void {
-        requestHTTP(URL: url, isGET: isGET, dicParams: dicParams) { (jsonObj, error) in
+    @objc  public static func requestAPI(URL url:String,
+                                         isGET: Bool,
+                                         dicParams:Dictionary<String, String>!,
+                                         dicData:Dictionary<String, Any>?,
+                                         completionHandler: @escaping (_ result: STVACallResult) -> Swift.Void) -> Void {
+        requestHTTP(URL: url, isGET: isGET, dicParams: dicParams, dicData: dicData) { (jsonObj, error) in
             DispatchQueue.main.async {
                 let result = STVACallResult(jsonObj: jsonObj, err: error)
                 completionHandler(result)
@@ -102,7 +120,11 @@ class STVAHttpRequest: NSObject {
         }
         
     }
-    @objc  public static func requestHTTP(URL url:String, isGET: Bool, dicParams:Dictionary<String, String>!, completionHandler: @escaping (Any?, Error?) -> Swift.Void) -> Void {
+    @objc  public static func requestHTTP(URL url:String,
+                                          isGET: Bool,
+                                          dicParams:Dictionary<String, String>!,
+                                          dicData:Dictionary<String, Any>?,
+                                          completionHandler: @escaping (Any?, Error?) -> Swift.Void) -> Void {
         var reqURLStr = url;
         var strParam:String!;
         if(dicParams != nil){
@@ -136,10 +158,38 @@ class STVAHttpRequest: NSObject {
             request.httpMethod = "GET";
         }else{
             request.httpMethod = "POST";
-            if(strParam != nil){
-                request.httpBody = strParam.data(using: .utf8)
+            let boundary = "Boundary-\(NSUUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            let body = NSMutableData();
+            //if(strParam != nil){
+            //    request.httpBody = strParam.data(using: .utf8)
+            //}
+            for (key, value) in dicParams {
+                body.appendString(string: "--\(boundary)\r\n")
+                body.appendString(string: "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
+                body.appendString(string: "\(value)\r\n")
             }
-            
+            if let dicData = dicData {
+                
+                for (key, postInfo) in dicData{
+                    if let dicFileInfo = postInfo as? Dictionary<String, Any>{
+                        if let filename = dicFileInfo["filename"] as? String,
+                            let mimetype = dicFileInfo["mimetype"] as? String,
+                            let data = dicFileInfo["data"] as? Data{
+                            body.appendString(string: "--\(boundary)\r\n")
+                            body.appendString(string: "Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(filename)\"\r\n")
+                            body.appendString(string: "Content-Type: \(mimetype)\r\n\r\n")
+                            body.append(data)
+                            body.appendString(string: "\r\n")
+                        }
+                    }
+                    
+                    
+                }
+            }
+            body.appendString(string: "--\(boundary)\r\n")
+            let data = body as Data
+            request.httpBody = data
         }
         debugPrint("HTTP Request: ", httpURL ?? "no http url")
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -181,3 +231,17 @@ class STVAHttpRequest: NSObject {
         
     }
 }
+
+extension NSMutableData {
+    
+    func appendString(string: String) {
+        //let data = string.data(usingusing: NSUTF8StringEncoding, allowLossyConversion: true)
+        //let data = String.da
+        //append(data!)
+        if let data = string.data(using: .utf8){
+            append(data)
+        }
+    }
+}
+
+

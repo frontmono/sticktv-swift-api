@@ -94,7 +94,7 @@ public class STVAStatus: NSObject {
     }
     private func getAccessToken(serviceName: String, serviceKey: String, prevToken:String?, completionHandler: @escaping (String?, Error?) -> Swift.Void){
         if let token = prevToken {
-            STVAHttpRequest.requestAPI(URL: STVAURL.Ins().urlAccountStatus, isGET: true, dicParams:[STVASTR.SSID.rawValue: token]) { (result: STVACallResult) in
+            STVAHttpRequest.requestAPI(URL: STVAURL.Ins().urlAccountStatus, isGET: true, dicParams:[STVASTR.SSID.rawValue: token], dicData:nil) { (result: STVACallResult) in
                 if result.error != nil {
                     completionHandler(nil, result.error)
                 }else{
@@ -124,7 +124,7 @@ public class STVAStatus: NSObject {
                 }
             }//STVAHttpRequest.requestAPI
         }else{
-            STVAHttpRequest.requestAPI(URL: STVAURL.Ins().urlAccountServiceLogin, isGET: true, dicParams: [STVASTR.name.rawValue:serviceName, STVASTR.key.rawValue:serviceKey]) { (result: STVACallResult) in
+            STVAHttpRequest.requestAPI(URL: STVAURL.Ins().urlAccountServiceLogin, isGET: true, dicParams: [STVASTR.name.rawValue:serviceName, STVASTR.key.rawValue:serviceKey], dicData: nil) { (result: STVACallResult) in
                 if result.error != nil {
                     completionHandler(nil, result.error)
                 }else{

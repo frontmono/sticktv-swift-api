@@ -111,16 +111,23 @@ public class STVAWebContainerView: UIView , UIWebViewDelegate {
     
     
     public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+ 
+       
         if let prefix = self.jsCallbackPrefix {
             if let url = request.url?.absoluteString {
                 if url.hasPrefix(prefix ) {
-                    self.loadCallbackHandler?(.JSCallback, url)
-                    return false
+                    let body = url[url.index(url.startIndex, offsetBy: prefix.count)..<url.endIndex]
+                    if let info = String(body).parseURL() {
+                        self.loadCallbackHandler?(.JSCallback, info)
+                        return false
+                    }
+                    
                 }
             }
             
         }
-       
+      
+        
         return true
     }
     public func webViewDidStartLoad(_ webView: UIWebView) {

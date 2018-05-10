@@ -32,6 +32,30 @@ public class STVACallAccount: NSObject {
         
     
     }
+    
+    @objc  public static func userKakaoLogin(token: String, completionHandler: @escaping (Error?) -> Swift.Void) {
+        STVAHttpRequest.requestAPIAfterToken(URL: STVAURL.Ins().urlAccountUserKakaoLogin, isGET: true, dicParams: [STVASTR.token.rawValue:token]) { (result: STVACallResult) in
+            if result.error != nil {completionHandler(result.error)}
+            else{
+                if let dicResult = result.data as? Dictionary<String, String> {
+                    if let user_idx = dicResult["user_idx"],
+                        let user_email = dicResult["user_email"] {
+                        STVAStatus.Ins().userIdx = user_idx
+                        STVAStatus.Ins().userEmail = user_email
+                        completionHandler(nil)
+                    }else{
+                        completionHandler(NSError(domain: "no user idx and email", code: 0, userInfo: nil))
+                    }
+                }else{
+                    completionHandler( NSError(domain: "data is not dic format", code: 0, userInfo: nil))
+                }
+            }
+            
+        }
+        
+    }
+    
+    
     @objc  public static func userFacebookLogin(token: String, completionHandler: @escaping (Error?) -> Swift.Void) {
         STVAHttpRequest.requestAPIAfterToken(URL: STVAURL.Ins().urlAccountUserFBLogin, isGET: true, dicParams: [STVASTR.token.rawValue:token]) { (result: STVACallResult) in
             if result.error != nil {completionHandler(result.error)}
@@ -51,7 +75,6 @@ public class STVACallAccount: NSObject {
             }
             
         }
-        
         
     }
     

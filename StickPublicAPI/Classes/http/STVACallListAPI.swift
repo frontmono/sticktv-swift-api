@@ -8,11 +8,19 @@
 import UIKit
 
 public class STVACallListAPI : NSObject {
-    @objc  public static func groupList(range: String, user_idx: String?, page: String?, count: String?,  completionHandler: @escaping (Array<STVAModelGroupInfo>?, Int, Error?) -> Swift.Void) {
+    @objc  public static func groupList(range: String,
+                                        caInfo: String?,
+                                        user_idx: String?,
+                                        page: String?,
+                                        count: String?,
+                                        completionHandler: @escaping (Array<STVAModelGroupInfo>?, Int, Error?) -> Swift.Void) {
         var dicParam:Dictionary<String, String> = [:]
         dicParam[STVASTR.range.rawValue] = range
         if let user_idx = user_idx {
             dicParam[STVASTR.user_idx.rawValue] = user_idx
+        }
+        if let caInfo = caInfo {
+            dicParam[STVASTR.caInfo.rawValue] = caInfo
         }
         if let page = page {
             dicParam[STVASTR.page.rawValue] = page
@@ -89,6 +97,36 @@ public class STVACallListAPI : NSObject {
         }//STVAHttpRequest.requestAPI
 
  
+        
+    }
+    @objc  public static func getAdPosterList(url: String, completionHandler: @escaping (Array<STVAPosterAddInfo>?, Error?) -> Swift.Void) {
+        STVAHttpRequest.requestAPI(URL: url, isGET: true, dicParams: [:], dicData: nil) { (result) in
+            if result.error != nil {completionHandler(nil, result.error)}
+            else{
+                do{
+                    if let items = result.data as? Array<Any> {
+                        var arrContent:Array<STVAPosterAddInfo> = []
+                        
+                        for item in items {
+                            let ctInfo = try STVAPosterAddInfo(jsonData: item)
+                            arrContent.append(ctInfo)
+                        }
+                        if (arrContent.count == 0){
+                            completionHandler(nil, NSError(domain: "result is empty", code: 0, userInfo: nil))
+                        }else{
+                            completionHandler(arrContent, nil)
+                        }
+                        
+                    }else{
+                        completionHandler(nil, NSError(domain: "data is not dic format", code: 0, userInfo: nil))
+                    }
+                    
+                }catch{
+                    completionHandler(nil, error)
+                }
+            }
+            
+        }//STVAHttpRequest.requestAPI
         
     }
     @objc  public static func contentListSNS(ch_idx: String, nextToken: String?, completionHandler: @escaping (Array<STVAModelContentInfo>?, String?, Error?) -> Swift.Void) {

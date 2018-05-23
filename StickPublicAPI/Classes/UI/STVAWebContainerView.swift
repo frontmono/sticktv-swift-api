@@ -39,6 +39,28 @@ public class STVAWebContainerView: UIView , UIWebViewDelegate {
         super.init(coder: aDecoder)
         commonInit()
     }
+    
+    private func commonInit(){
+        self.webViewer = UIWebView()
+        //self.webViewer.backgroundColor = UIColor.red
+        
+        self.addSubview(self.webViewer)
+        webViewer.stva_CoverSuperview()
+        self.errViewer = UILabel()
+        self.errViewer.text = "Hello World"
+        self.errViewer.isHidden = true
+        self.errViewer.numberOfLines = 0
+        self.errViewer.textAlignment = .center
+        self.addSubview(self.errViewer)
+        self.errViewer.stva_CoverSuperview()
+        
+        addPullToRefreshToWebView()
+        
+        
+        
+    }
+    
+    
     public func showError(message msg:String){
         self.webViewer.isHidden = true
         self.errViewer.isHidden = false
@@ -73,25 +95,7 @@ public class STVAWebContainerView: UIView , UIWebViewDelegate {
         })
         
     }
-    private func commonInit(){
-        self.webViewer = UIWebView()
-        //self.webViewer.backgroundColor = UIColor.red
-        
-        self.addSubview(self.webViewer)
-        webViewer.stva_CoverSuperview()
-        self.errViewer = UILabel()
-        self.errViewer.text = "Hello World"
-        self.errViewer.isHidden = true
-        self.errViewer.numberOfLines = 0
-        self.errViewer.textAlignment = .center
-        self.addSubview(self.errViewer)
-        self.errViewer.stva_CoverSuperview()
-        
-        addPullToRefreshToWebView()
-        
-        
-        
-    }
+    
     private func addPullToRefreshToWebView(){
         webViewer.scrollView.bounces = true //DONT FORGET IT!!!
         

@@ -8,7 +8,7 @@
 import UIKit
 public enum STVASTR :String {
     case all, audio
-    case ch_idx, count
+    case caInfo, category, ch_idx, count
     case desc, dummy
     case email, extra
     case gr_idx, group
@@ -61,6 +61,9 @@ public class STVAURL: NSObject {
     public private(set) var urlUploadAddContent:String!
     public private(set) var urlUploadDumyFile:String!
     
+    
+    public private(set) var urlSampleAdPoster:String!
+    
     public private(set) var appMakeFandom:String!
     
     @objc public static func Ins() -> STVAURL {
@@ -73,7 +76,7 @@ public class STVAURL: NSObject {
     
     private init(type: RELEASE_TYPE){
         self.releaseType = type
-        let localIP = "192.168.106.103"
+        let localIP = "192.168.106.104"
         
         switch type {
         case .DEV:
@@ -108,6 +111,9 @@ public class STVAURL: NSObject {
         
         self.urlUploadAddContent = self.domainAPI + "/1.0.0/upload/addContent"
         self.urlUploadDumyFile = self.domainAPI + "/1.0.0/upload/file"
+        
+        
+        self.urlSampleAdPoster = self.domainAPI + "/1.0.0/sample/poster"
         
         
         

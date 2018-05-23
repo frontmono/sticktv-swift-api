@@ -17,7 +17,7 @@ enum ParsingError: Error {
 
 
 
-class STVACallResult: NSObject {
+public class STVACallResult: NSObject {
     public private(set) var error:Error?
     public private(set) var data:Any?
     public init(err: Error?) {
@@ -61,7 +61,7 @@ class STVACallResult: NSObject {
     }
 }
 
-class STVAHttpRequest: NSObject {
+public class STVAHttpRequest: NSObject {
     
     @objc  public static func requestAPIAfterToken(URL url:String,
                                                    isGET: Bool,

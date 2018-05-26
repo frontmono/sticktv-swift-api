@@ -60,4 +60,17 @@ public extension String{
         }
         return nil
     }
+    func getDigit2Duration() -> String? {
+        if let iDur = Int(self) {
+            if (iDur > 0){
+                let sec:Int = iDur % 60
+                let tmp:Int = (iDur - sec) / 60
+                let min:Int = tmp % 60
+                let hour:Int = (tmp - min) / 60
+                return String(format: "%02d", hour) + ":" + String(format: "%02d", min) + ":" + String(format: "%02d", sec)
+                
+            }
+        }
+        return nil
+    }
 }

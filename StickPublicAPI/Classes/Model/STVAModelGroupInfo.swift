@@ -6,11 +6,16 @@
 //
 
 import UIKit
-
+public protocol GroupOperationProtocol : AnyObject{
+    func onGroupInfoSelected(groupInfo: STVAModelGroupInfo)
+    
+}
 public class STVAModelGroupInfo: NSObject , NSCoding{
     
     
-    
+    public enum JoinStatus : Int {
+        case none, owner, joind, waiting
+    }
     
     @objc public private(set) var idx:String!
     @objc public private(set) var name:String!
@@ -19,6 +24,9 @@ public class STVAModelGroupInfo: NSObject , NSCoding{
     @objc public private(set) var category:String?
     @objc public private(set) var owner_userIdx:String?
     @objc public private(set) var owner_nickname:String?
+    @objc public private(set) var cntHeart:String?
+    @objc public private(set) var cntMember:String?
+    public private(set) var joinStatus:JoinStatus = .none
     
     
     public init(jsonData: Any?) throws {
@@ -35,7 +43,10 @@ public class STVAModelGroupInfo: NSObject , NSCoding{
             self.owner_userIdx = dicOwner["user_idx"]
             self.owner_nickname = dicOwner["nickname"]
         }
-        
+        if let dicCount = dictionary["count"] as? Dictionary<String, String> {
+            self.cntHeart = dicCount["heart"]
+            self.cntMember = dicCount["member"]
+        }
         
         
     }

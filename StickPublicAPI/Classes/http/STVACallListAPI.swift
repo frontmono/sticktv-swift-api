@@ -92,13 +92,34 @@ public class STVACallListAPI : NSObject {
                     completionHandler(nil, error)
                 }
             }
- 
-                
-        }//STVAHttpRequest.requestAPI
-
- 
-        
+        }//STVAHttpRequest.requestAPI\
     }
+    @objc  public static func getSocialChannelInGroup(gr_idx:String, category:String, completionHandler: @escaping (Array<STVAModelChannelInfo>?, Error?) -> Swift.Void) {
+        var dicParam:Dictionary<String, String> = [:]
+        dicParam[STVASTR.gr_idx.rawValue] = gr_idx
+        dicParam[STVASTR.category.rawValue] = category
+        STVAHttpRequest.requestAPIAfterToken(URL: STVAURL.Ins().urlListGroupCategoryChannel, isGET: true, dicParams: dicParam) { (result: STVACallResult) in
+            if result.error != nil {completionHandler(nil, result.error)}
+            else{
+                guard let arrResult = result.data as? Array<Any> else{
+                    completionHandler(nil, NSError(domain: "data us not array", code: 0, userInfo: nil))
+                    return
+                }
+                var arrContent:Array<STVAModelChannelInfo> = []
+                do{
+                    for item in arrResult {
+                        let ctInfo = try STVAModelChannelInfo(jsonData: item)
+                        arrContent.append(ctInfo)
+                    }
+                    completionHandler(arrContent, nil)
+                }catch{
+                    completionHandler(nil, error)
+                }
+            }
+        }//STVAHttpRequest.requestAPI\
+    }
+    
+    
     @objc  public static func getAdPosterList(url: String, completionHandler: @escaping (Array<STVAPosterAddInfo>?, Error?) -> Swift.Void) {
         STVAHttpRequest.requestAPI(URL: url, isGET: true, dicParams: [:], dicData: nil) { (result) in
             if result.error != nil {completionHandler(nil, result.error)}
@@ -129,11 +150,17 @@ public class STVACallListAPI : NSObject {
         }//STVAHttpRequest.requestAPI
         
     }
-    @objc  public static func contentListSNS(ch_idx: String, nextToken: String?, completionHandler: @escaping (Array<STVAModelContentInfo>?, String?, Error?) -> Swift.Void) {
+    @objc  public static func contentListSNS(ch_idx: String, page:String?, count:String?, nextToken: String?, completionHandler: @escaping (Array<STVAModelContentInfo>?, String?, Error?) -> Swift.Void) {
         var dicParam:Dictionary<String, String> = [:]
         dicParam[STVASTR.ch_idx.rawValue] = ch_idx
         if let nToken = nextToken {
             dicParam[STVASTR.nextToken.rawValue] = nToken
+        }
+        if let page = page {
+            dicParam[STVASTR.page.rawValue] = page
+        }
+        if let count = count {
+            dicParam[STVASTR.count.rawValue] = count
         }
         STVAHttpRequest.requestAPIAfterToken(URL: STVAURL.Ins().urlListContentSNS, isGET: true, dicParams: dicParam) { (result: STVACallResult) in
             if result.error != nil {completionHandler(nil, nil, result.error)}

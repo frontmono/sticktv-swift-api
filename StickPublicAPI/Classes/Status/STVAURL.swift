@@ -57,6 +57,8 @@ public class STVAURL: NSObject {
     public private(set) var urlListContentSNS:String!
     public private(set) var urlListGroupJoined:String!
     public private(set) var urlListContentHome:String!
+    public private(set) var urlListGroupCategoryChannel:String!
+    
     
     public private(set) var urlUploadAddContent:String!
     public private(set) var urlUploadDumyFile:String!
@@ -107,7 +109,7 @@ public class STVAURL: NSObject {
         self.urlListContentSNS = self.domainAPI + "/1.0.0/list/content/sns"
         self.urlListContentHome = self.domainAPI + "/1.0.0/list/content/home"
         self.urlListGroupJoined = self.domainAPI + "/1.0.0/list/group"
-        
+        self.urlListGroupCategoryChannel = self.domainAPI + "/1.0.0/list/channel/groupCategory"
         
         self.urlUploadAddContent = self.domainAPI + "/1.0.0/upload/addContent"
         self.urlUploadDumyFile = self.domainAPI + "/1.0.0/upload/file"

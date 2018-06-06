@@ -129,11 +129,14 @@ public class STVAHttpRequest: NSObject {
         var strParam:String!;
         if(dicParams != nil){
             for (k, v) in dicParams {
-                if(strParam == nil){
-                    strParam = k + "=" + v
-                }else{
-                    strParam = strParam + "&" + k + "=" + v
+                if let urlValue=v.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed){
+                    if(strParam == nil){
+                        strParam = k + "=" + urlValue
+                    }else{
+                        strParam = strParam + "&" + k + "=" + urlValue
+                    }
                 }
+                
             }
         }
         
@@ -152,84 +155,91 @@ public class STVAHttpRequest: NSObject {
             
         }
        
-        let httpURL = URL(string: reqURLStr)
-        var request = URLRequest(url: httpURL!)
-        if(isGET){
-            request.httpMethod = "GET";
-        }else{
-            request.httpMethod = "POST";
-            let boundary = "Boundary-\(NSUUID().uuidString)"
-            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-            let body = NSMutableData();
-            //if(strParam != nil){
-            //    request.httpBody = strParam.data(using: .utf8)
-            //}
-            for (key, value) in dicParams {
-                body.appendString(string: "--\(boundary)\r\n")
-                body.appendString(string: "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
-                body.appendString(string: "\(value)\r\n")
-            }
-            if let dicData = dicData {
-                
-                for (key, postInfo) in dicData{
-                    if let dicFileInfo = postInfo as? Dictionary<String, Any>{
-                        if let filename = dicFileInfo["filename"] as? String,
-                            let mimetype = dicFileInfo["mimetype"] as? String,
-                            let data = dicFileInfo["data"] as? Data{
-                            body.appendString(string: "--\(boundary)\r\n")
-                            body.appendString(string: "Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(filename)\"\r\n")
-                            body.appendString(string: "Content-Type: \(mimetype)\r\n\r\n")
-                            body.append(data)
-                            body.appendString(string: "\r\n")
+        if let httpURL = URL(string: reqURLStr) {
+            var request = URLRequest(url: httpURL)
+            if(isGET){
+                request.httpMethod = "GET";
+            }else{
+                request.httpMethod = "POST";
+                let boundary = "Boundary-\(NSUUID().uuidString)"
+                request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+                let body = NSMutableData();
+                //if(strParam != nil){
+                //    request.httpBody = strParam.data(using: .utf8)
+                //}
+                for (key, value) in dicParams {
+                    body.appendString(string: "--\(boundary)\r\n")
+                    body.appendString(string: "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
+                    body.appendString(string: "\(value)\r\n")
+                }
+                if let dicData = dicData {
+                    
+                    for (key, postInfo) in dicData{
+                        if let dicFileInfo = postInfo as? Dictionary<String, Any>{
+                            if let filename = dicFileInfo["filename"] as? String,
+                                let mimetype = dicFileInfo["mimetype"] as? String,
+                                let data = dicFileInfo["data"] as? Data{
+                                body.appendString(string: "--\(boundary)\r\n")
+                                body.appendString(string: "Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(filename)\"\r\n")
+                                body.appendString(string: "Content-Type: \(mimetype)\r\n\r\n")
+                                body.append(data)
+                                body.appendString(string: "\r\n")
+                            }
                         }
+                        
+                        
                     }
+                }
+                body.appendString(string: "--\(boundary)\r\n")
+                let data = body as Data
+                request.httpBody = data
+            }
+            debugPrint("HTTP Request: ", httpURL )
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                guard let data = data, error == nil else {                                                 // check for fundamental networking error
+                    print("error=\(String(describing: error))")
+                    completionHandler(nil, error)
+                    return
+                }
+                
+                if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+                    debugPrint("statusCode should be 200, but is \(httpStatus.statusCode)")
+                    //print("response = \(String(describing: response))")
+                    let err = NSError(domain: "status code is not 200", code: httpStatus.statusCode, userInfo: ["response": String(describing: response)])
+                    completionHandler(nil, err)
+                    return
+                    
+                    
                     
                     
                 }
-            }
-            body.appendString(string: "--\(boundary)\r\n")
-            let data = body as Data
-            request.httpBody = data
-        }
-        debugPrint("HTTP Request: ", httpURL ?? "no http url")
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {                                                 // check for fundamental networking error
-                print("error=\(String(describing: error))")
-                completionHandler(nil, error)
-                return
-            }
-            
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
-                debugPrint("statusCode should be 200, but is \(httpStatus.statusCode)")
-                //print("response = \(String(describing: response))")
-                let err = NSError(domain: "status code is not 200", code: httpStatus.statusCode, userInfo: ["response": String(describing: response)])
-                completionHandler(nil, err)
-                return
-                
-                
-                
-                
-            }
-            do{
-                debugPrint(String(data: data, encoding: .utf8) ?? "no data")
-                if let jsonResult = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]{
-                    completionHandler(jsonResult, nil)
-                }else{
-                    completionHandler(nil, NSError(domain: "Result Json Parsing Failed", code: 0, userInfo: ["response text":String(data: data, encoding: .utf8) ?? "Error Default"]))
+                do{
+                    debugPrint(String(data: data, encoding: .utf8) ?? "no data")
+                    if let jsonResult = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]{
+                        completionHandler(jsonResult, nil)
+                    }else{
+                        completionHandler(nil, NSError(domain: "Result Json Parsing Failed", code: 0, userInfo: ["response text":String(data: data, encoding: .utf8) ?? "Error Default"]))
+                    }
+                }catch{
+                    completionHandler(nil, error)
                 }
-            }catch{
-                completionHandler(nil, error)
+                //let responseString = String(data: data, encoding: .utf8)
+                //print("responseString = \(String(describing: responseString))")
+                
+                
             }
-            //let responseString = String(data: data, encoding: .utf8)
-            //print("responseString = \(String(describing: responseString))")
-            
+            task.resume()
+        }else{
+            let err = NSError(domain: "URL parsing failed", code: 0, userInfo: nil)
+            completionHandler(nil, err)
+            return
             
         }
-        task.resume()
         
         
         
-    }
+        
+    } //@objc  public static func requ
 }
 
 extension NSMutableData {

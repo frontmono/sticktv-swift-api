@@ -8,7 +8,7 @@
 import UIKit
 public enum STVASTR :String {
     case all, audio
-    case caInfo, category, ch_idx, count
+    case caInfo, category, ch_idx, cid, comment, count
     case desc, dummy
     case email, extra
     case gr_idx, group
@@ -20,7 +20,7 @@ public enum STVASTR :String {
     case page, pass
     case range
     case search, SSID
-    case text, title, token, type
+    case target, text, title, token, type
     case uid, user, user_idx
     case video
     case YouTube
@@ -40,7 +40,7 @@ public class STVAURL: NSObject {
     
     static var shared:STVAURL!
     
-    
+    static public private(set) var isDeveloping = false
     public private(set) var releaseType: RELEASE_TYPE!
     public private(set) var domainAPI: String!
     public private(set) var domainApp: String!
@@ -60,9 +60,14 @@ public class STVAURL: NSObject {
     public private(set) var urlListGroupCategoryChannel:String!
     
     
+    public private(set) var urlCommentList:String!
+    public private(set) var urlCommentAdd:String!
+    public private(set) var urlCommentRemove:String!
+    
+    
     public private(set) var urlUploadAddContent:String!
     public private(set) var urlUploadDumyFile:String!
-    
+    public private(set) var urlUpdateImage:String!
     
     public private(set) var urlSampleAdPoster:String!
     
@@ -78,7 +83,7 @@ public class STVAURL: NSObject {
     
     private init(type: RELEASE_TYPE){
         self.releaseType = type
-        let localIP = "192.168.106.104"
+        let localIP = "192.168.106.107"
         
         switch type {
         case .DEV:
@@ -86,10 +91,11 @@ public class STVAURL: NSObject {
             self.domainAPI = "https://dev.api.stick.tv:8301"
             self.domainImageCache = "https://dev.images.stick.tv:9091/img/"
         case .LOCAL:
+            STVAURL.isDeveloping = true
             //self.domainAPI = "http://localhost:8300"
             self.domainAPI = "http://" + localIP + ":8300"
             self.domainImageCache = "https://dev.images.stick.tv:9091/img/"
-            self.domainApp = "http://" + localIP + ":3000/app/?api=local"
+            self.domainApp = "http://" + localIP + ":3000/?api=local"
             
         case .RELEASE:
             self.domainAPI = "https://api.wetribe.io"
@@ -113,6 +119,13 @@ public class STVAURL: NSObject {
         
         self.urlUploadAddContent = self.domainAPI + "/1.0.0/upload/addContent"
         self.urlUploadDumyFile = self.domainAPI + "/1.0.0/upload/file"
+        self.urlUpdateImage = self.domainAPI + "/1.0.0/update/image"
+        
+        
+        self.urlCommentList = self.domainAPI + "/1.0.0/comment/list"
+        self.urlCommentAdd = self.domainAPI + "/1.0.0/comment/add"
+        self.urlCommentRemove = self.domainAPI + "/1.0.0/comment/remove"
+        
         
         
         self.urlSampleAdPoster = self.domainAPI + "/1.0.0/sample/poster"

@@ -20,7 +20,7 @@ public class STVAModelGroupInfo: NSObject , NSCoding{
     @objc public private(set) var idx:String!
     @objc public private(set) var name:String!
     @objc public private(set) var disp_name:String?
-    @objc public private(set) var thumbnail:String?
+    @objc public var thumbnail:String?
     @objc public private(set) var category:String?
     @objc public private(set) var owner_userIdx:String?
     @objc public private(set) var owner_nickname:String?

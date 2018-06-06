@@ -32,6 +32,42 @@ public class STVACallUpload : NSObject {
             
         }
     }
+    @objc  public static func imageUploadAndUpdate(imageData: Data,
+                                          type: String,
+                                          target: String,
+                                         completionHandler: @escaping (String?, Error?) -> Swift.Void) {
+        uploadDumy(filename: "image.png", fileData: imageData, mimeType: "image/jpeg", type: STVASTR.image.rawValue) { (uploadInfo, err) in
+            if let uploadInfo = uploadInfo {
+                imageUpdate(type: type, target: target, key: uploadInfo.keyInfo, completionHandler: completionHandler)
+            }else{
+                completionHandler(nil, err)
+            }
+        }
+    }
+    @objc  public static func imageUpdate(type: String,
+                                         target: String,
+                                         key: String,
+                                         completionHandler: @escaping (String?, Error?) -> Swift.Void) {
+        var dicParam:Dictionary<String, String> = [:]
+        dicParam[STVASTR.type.rawValue] = type
+        dicParam[STVASTR.target.rawValue] = target
+        dicParam[STVASTR.key.rawValue] = key
+        
+        
+        
+        STVAHttpRequest.requestAPIAfterToken(URL: STVAURL.Ins().urlUpdateImage, isGET: true, dicParams: dicParam) { (result: STVACallResult) in
+            if result.error != nil {completionHandler(nil, result.error)}
+            else{
+                if let dicResult = result.data as? Dictionary<String, String> ,
+                    let url = dicResult["url"]{
+                    completionHandler(url, nil);
+                }else{
+                    completionHandler(nil, NSError(domain: "no url in result", code: 0, userInfo: nil))
+                }
+            }
+            
+        }//STVAHttpRequest.requestAPI
+    }
     @objc  public static func addContent(title: String?,
                                          desc: String?,
                                          type: String,

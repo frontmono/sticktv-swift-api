@@ -7,21 +7,23 @@
 
 import UIKit
 public enum STVASTR :String {
-    case all, audio
+    case all, attachExt, audio
     case caInfo, category, ch_idx, cid, comment, count
     case desc, dummy
     case email, extra
+    case filter
     case gr_idx, group
     case image
     case joined
     case key
-    case name, nextToken, nickname
+    case musicfolio // music folio
+    case name, nextToken, nickname, normal
     case own
     case page, pass
     case range
-    case search, SSID
-    case target, text, title, token, type
-    case uid, user, user_idx
+    case search, sing, SSID
+    case talk, target, text, title, token, type
+    case uid, ukey, user, user_idx
     case video
     case YouTube
     
@@ -63,11 +65,13 @@ public class STVAURL: NSObject {
     public private(set) var urlCommentList:String!
     public private(set) var urlCommentAdd:String!
     public private(set) var urlCommentRemove:String!
+    public private(set) var urlLikeAction:String!
     
     
     public private(set) var urlUploadAddContent:String!
     public private(set) var urlUploadDumyFile:String!
     public private(set) var urlUpdateImage:String!
+    public private(set) var urlUpdateSoicalContent:String!
     
     public private(set) var urlSampleAdPoster:String!
     
@@ -83,7 +87,7 @@ public class STVAURL: NSObject {
     
     private init(type: RELEASE_TYPE){
         self.releaseType = type
-        let localIP = "192.168.106.107"
+        let localIP = "192.168.106.109"
         
         switch type {
         case .DEV:
@@ -120,11 +124,14 @@ public class STVAURL: NSObject {
         self.urlUploadAddContent = self.domainAPI + "/1.0.0/upload/addContent"
         self.urlUploadDumyFile = self.domainAPI + "/1.0.0/upload/file"
         self.urlUpdateImage = self.domainAPI + "/1.0.0/update/image"
+        self.urlUpdateSoicalContent = self.domainAPI + "/1.0.0/upload/importSocial"
         
         
         self.urlCommentList = self.domainAPI + "/1.0.0/comment/list"
         self.urlCommentAdd = self.domainAPI + "/1.0.0/comment/add"
         self.urlCommentRemove = self.domainAPI + "/1.0.0/comment/remove"
+        
+        self.urlLikeAction = self.domainAPI + "/1.0.0/like/action"
         
         
         

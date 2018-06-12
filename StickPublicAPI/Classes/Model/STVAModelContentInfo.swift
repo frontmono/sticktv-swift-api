@@ -19,7 +19,7 @@ public class STVAModelContentInfo: NSObject {
     @objc public private(set) var desc: String?
     @objc public private(set) var thumbnail: String?
     @objc public private(set) var type:ContentType_ = .Unknown
-    @objc public private(set) var meta:Dictionary<String, Any> = [:]
+    @objc public var meta:Dictionary<String, Any> = [:]
     
     public init(jsonData: Any?, type:ContentType_) throws {
         super.init()

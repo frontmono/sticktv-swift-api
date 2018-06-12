@@ -83,7 +83,7 @@ public class STVAHttpRequest: NSObject {
                 //let httpURL = url + "?" + STVASTR.SSID. + "=" + STVAStatus.Ins().accessToken!
                 var httpURL = url
                 if url.contains("?") {
-                    httpURL += httpURL + "&"
+                    httpURL = httpURL + "&"
                 }else{
                     httpURL += "?"
                 }

@@ -63,13 +63,22 @@ public class STVACallListAPI : NSObject {
         
     }
     //
-    @objc  public static func contentListHome(page: String, count: String, type:String, gr_idx:String?, user_idx:String?, completionHandler: @escaping (Array<STVAModelContentInfo>?, Error?) -> Swift.Void) {
+    @objc  public static func contentListHome(page: String,
+                                              count: String,
+                                              type:String,
+                                              filter: String?,
+                                              gr_idx:String?,
+                                              user_idx:String?,
+                                              completionHandler: @escaping (Array<STVAModelContentInfo>?, Error?) -> Swift.Void) {
         var dicParam:Dictionary<String, String> = [:]
         dicParam[STVASTR.page.rawValue] = page
         dicParam[STVASTR.count.rawValue] = count
         dicParam[STVASTR.type.rawValue] = type
         if let tmp = gr_idx {
             dicParam[STVASTR.gr_idx.rawValue] = tmp
+        }
+        if let tmp = filter {
+            dicParam[STVASTR.filter.rawValue] = tmp
         }
         if let tmp = user_idx {
             dicParam[STVASTR.user_idx.rawValue] = tmp

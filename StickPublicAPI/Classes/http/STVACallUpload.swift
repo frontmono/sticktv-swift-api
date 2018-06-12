@@ -71,11 +71,13 @@ public class STVACallUpload : NSObject {
     @objc  public static func addContent(title: String?,
                                          desc: String?,
                                          type: String,
+                                         attach_ext: String,
                                          gr_idx: String?,
                                          extra: String?,
                                          completionHandler: @escaping (String?, Error?) -> Swift.Void) {
         var dicParam:Dictionary<String, String> = [:]
         dicParam[STVASTR.type.rawValue] = type
+        dicParam[STVASTR.attachExt.rawValue] = attach_ext
         if let title = title {dicParam[STVASTR.title.rawValue] = title}
         if let desc = desc {dicParam[STVASTR.desc.rawValue] = desc}
         if let extra = extra {dicParam[STVASTR.extra.rawValue] = extra}
@@ -95,5 +97,25 @@ public class STVACallUpload : NSObject {
             
         }//STVAHttpRequest.requestAPI
     }
+    @objc  public static func importContent(ukey: String, gr_idx: String,
+                                         completionHandler: @escaping (String?, Error?) -> Swift.Void) {
+        var dicParam:Dictionary<String, String> = [:]
+        dicParam[STVASTR.gr_idx.rawValue] = gr_idx
+        dicParam[STVASTR.ukey.rawValue] = ukey
+        
+        STVAHttpRequest.requestAPIAfterToken(URL: STVAURL.Ins().urlUpdateSoicalContent, isGET: true, dicParams: dicParam) { (result: STVACallResult) in
+            if result.error != nil {completionHandler(nil, result.error)}
+            else{
+                if let dicResult = result.data as? Dictionary<String, String> ,
+                    let cid = dicResult["cid"]{
+                    completionHandler(cid, nil);
+                }else{
+                    completionHandler(nil, NSError(domain: "no cid in result", code: 0, userInfo: nil))
+                }
+            }
+            
+        }//STVAHttpRequest.requestAPI
+    }
+    
 }
 

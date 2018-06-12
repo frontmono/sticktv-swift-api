@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class STVACallComment: NSObject {
+public class STVACallSocial: NSObject {
     @objc  public static func getList(cts_idx: String, page:String?, count:String?, completionHandler: @escaping (Array<STVAModelCommentInfo>?, Int, Error?) -> Swift.Void) {
         var dicParam:Dictionary<String, String> = [:]
         dicParam[STVASTR.cid.rawValue] = cts_idx
@@ -83,5 +83,31 @@ public class STVACallComment: NSObject {
         
         
     }//@objc  public static func content
-    
+    @objc  public static func likeAction(cts_idx: String, type: String, completionHandler: @escaping (String?, Int, Error?) -> Swift.Void) {
+        var dicParam:Dictionary<String, String> = [:]
+        dicParam[STVASTR.cid.rawValue] = cts_idx
+        dicParam[STVASTR.type.rawValue] = type
+        STVAHttpRequest.requestAPIAfterToken(URL: STVAURL.Ins().urlLikeAction, isGET: true, dicParams: dicParam) { (result: STVACallResult) in
+            if result.error != nil {completionHandler(nil, 0, result.error)}
+            else{
+                if let dicResult = result.data as? Dictionary<String, Any> {
+                    if let like_idx = dicResult["like_idx"] as? String,
+                        let count = dicResult["count"] as? String{
+                        if let count = Int(count) {
+                            
+                            completionHandler(like_idx, count, nil)
+                        }else{
+                            completionHandler(nil, 0, NSError(domain: "cmt_idx, count int casting failed", code: 0, userInfo: nil))
+                        }
+                    }else{
+                        completionHandler(nil, 0, NSError(domain: "data is not type, cmt_idx, count format", code: 0, userInfo: nil))
+                    }
+                }else{
+                    completionHandler(nil, 0, NSError(domain: "data is not dic format", code: 0, userInfo: nil))
+                }
+            }
+            
+        }//STVAHttpRequest.requestAPI
+        
+    }
 }
